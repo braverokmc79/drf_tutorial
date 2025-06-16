@@ -1,0 +1,23 @@
+# 설치 방법 :1)리눅스   PYTHONUTF8=1 pip install -r requirements.txt
+#2)파월셀 :  $env:PYTHONUTF8=1; pip install -r requirements.txt
+
+Django==5.2.1 
+djangorestframework>=3.14
+asgiref==3.8.1
+sqlparse==0.5.3
+gunicorn
+
+# ORM 및 DB
+# psycopg2-binary  # PostgreSQL
+# mysqlclient      # MySQL
+
+# 개발 도구
+pytest
+pytest-django
+python-dotenv
+django-debug-toolbar
+
+# Admin 테마
+django-jazzmin>=2.6.0       # 세련된 Bootstrap 기반 Django Admin 테마
+django-unfold>=0.20.0       # Tailwind 기반 Admin 테마 (https://github.com/unfoldadmin/unfold)
+
