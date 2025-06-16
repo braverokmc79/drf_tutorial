@@ -1,11 +1,20 @@
-# 설치 방법 :1)리눅스   PYTHONUTF8=1 pip install -r requirements.txt
-#2)파월셀 :  $env:PYTHONUTF8=1; pip install -r requirements.txt
+# 설치 방법 :
+#1)리눅스   PYTHONUTF8=1 pip install -r requirements.txt
+#2)파워셸 :  $env:PYTHONUTF8=1; pip install -r requirements.txt
 
-Django==5.2.1 
+
+Django==5.2.1
+
+# Django REST framework 및 확장 라이브러리
 djangorestframework>=3.14
+markdown                # Markdown 지원 (Browsable API용)
+django-filter           # 필터 기능 추가 (추후 사용 가능)
+pygments                # 코드 하이라이팅을 위한 Pygments
+
 asgiref==3.8.1
 sqlparse==0.5.3
 gunicorn
+
 
 # ORM 및 DB
 # psycopg2-binary  # PostgreSQL
