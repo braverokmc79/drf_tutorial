@@ -119,6 +119,16 @@ git commit -m "chore: requirements.txt 정리"
 
 ---
 
+
+##### 장고 관리자를 사용하기 위해서는 슈퍼 유저를 생성
+```
+python manage.py createsuperuser
+
+
+```
+
+
+
 ## 👨‍💼 Author
 
 * **코담(Codam)**: [https://codam.kr](https://codam.kr)
