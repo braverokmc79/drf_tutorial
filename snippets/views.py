@@ -16,6 +16,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.reverse import reverse
 from rest_framework import renderers
 
+from rest_framework import viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
+
+
 
 
 """
@@ -147,61 +152,89 @@ Mixin을 활용한 코드 재사용
 """    
 
 
-# ✨ Snippet 목록 조회(GET), 생성(POST) View
-class SnippetList(generics.ListCreateAPIView):
+# # ✨ Snippet 목록 조회(GET), 생성(POST) View
+# class SnippetList(generics.ListCreateAPIView):
+#     queryset = Snippet.objects.all()
+#     serializer_class = SnippetSerializer
+    
+#     # 인증된 사용자만 쓰기 가능, 비인증 사용자는 읽기만 가능
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+#     # POST 요청 시, 현재 요청한 사용자를 Snippet의 소유자로 저장
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
+    
+
+# # ✨ Snippet 단건 조회(GET), 수정(PUT), 삭제(DELETE) View
+# class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Snippet.objects.all()
+#     serializer_class = SnippetSerializer
+     
+#      # 인증된 사용자만 쓰기 가능 + 오직 소유자만 수정/삭제 가능
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    
+    
+    
+# # ✨ 모든 사용자 목록 조회 View
+# class UserList(generics.ListAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+    
+# # ✨ 특정 사용자 정보 조회 View (pk로 지정)
+# class UserDetail(generics.RetrieveAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer    
+    
+    
+    
+# # 회원가입 (User 생성)
+# class UserCreate(generics.CreateAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#     permission_classes = [AllowAny]    
+    
+    
+    
+# @api_view(['GET'])
+# def api_root(request, format=None):
+#     return Response({
+#         'users': reverse('user-list', request=request, format=format),
+#         'snippets': reverse('snippet-list', request=request, format=format)
+#     })
+    
+    
+# class SnippetHighlight(generics.GenericAPIView):
+#     queryset = Snippet.objects.all()
+#     renderer_classes = [renderers.StaticHTMLRenderer]
+#     def get(self, request, *args, **kwargs):
+#         snippet = self.get_object()
+#         return Response(snippet.highlighted)    
+    
+    
+"""
+ ViewSet
+ 
+ Tutorial 6: ViewSets & Routers에서는 기존의 뷰 클래스들을 ViewSet으로 통합하고, URL 구성을 DefaultRouter로 자동화하는 방식으로 변경
+"""    
+
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+
+class SnippetViewSet(viewsets.ModelViewSet):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     
-    # 인증된 사용자만 쓰기 가능, 비인증 사용자는 읽기만 가능
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    
-    # POST 요청 시, 현재 요청한 사용자를 Snippet의 소유자로 저장
+    @action(detail=True, renderer_classes=[renderers.StaticHTMLRenderer])
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
     
 
-# ✨ Snippet 단건 조회(GET), 수정(PUT), 삭제(DELETE) View
-class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Snippet.objects.all()
-    serializer_class = SnippetSerializer
-     
-     # 인증된 사용자만 쓰기 가능 + 오직 소유자만 수정/삭제 가능
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     
     
-    
-# ✨ 모든 사용자 목록 조회 View
-class UserList(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    
-# ✨ 특정 사용자 정보 조회 View (pk로 지정)
-class UserDetail(generics.RetrieveAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer    
-    
-    
-    
-    
-# 회원가입 (User 생성)
-class UserCreate(generics.CreateAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [AllowAny]    
-    
-    
-    
-@api_view(['GET'])
-def api_root(request, format=None):
-    return Response({
-        'users': reverse('user-list', request=request, format=format),
-        'snippets': reverse('snippet-list', request=request, format=format)
-    })
-    
-    
-class SnippetHighlight(generics.GenericAPIView):
-    queryset = Snippet.objects.all()
-    renderer_classes = [renderers.StaticHTMLRenderer]
-    def get(self, request, *args, **kwargs):
-        snippet = self.get_object()
-        return Response(snippet.highlighted)    
