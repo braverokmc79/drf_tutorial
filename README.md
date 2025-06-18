@@ -144,6 +144,9 @@ python manage.py createsuperuser
 
 ```
 
+```bash
+ python manage.py startapp tutorial
+```
 
 
 ## 👨‍💼 Author

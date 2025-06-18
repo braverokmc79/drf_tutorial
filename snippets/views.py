@@ -1,15 +1,18 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import mixins, generics
+from rest_framework import mixins
+from django.http import Http404
+from rest_framework.views import APIView
+
 
 from snippets.models import Snippet
-from snippets.serializers import SnippetSerializer
-from django.http import Http404
-
-from rest_framework.views import APIView
-     
-from rest_framework import generics
+from snippets.serializers import SnippetSerializer     
+from rest_framework import generics, permissions
+from snippets.permissions import IsOwnerOrReadOnly
+from django.contrib.auth.models import User
+from snippets.serializers import SnippetSerializer, UserSerializer
+from rest_framework.permissions import AllowAny
 
 """
 FBV → 
@@ -139,11 +142,45 @@ Mixin을 활용한 코드 재사용
 완성형 GenericView로 최적화
 """    
 
+
+# ✨ Snippet 목록 조회(GET), 생성(POST) View
 class SnippetList(generics.ListCreateAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+    
+    # 인증된 사용자만 쓰기 가능, 비인증 사용자는 읽기만 가능
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    
+    # POST 요청 시, 현재 요청한 사용자를 Snippet의 소유자로 저장
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+    
 
+# ✨ Snippet 단건 조회(GET), 수정(PUT), 삭제(DELETE) View
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
      
+     # 인증된 사용자만 쓰기 가능 + 오직 소유자만 수정/삭제 가능
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    
+    
+    
+# ✨ 모든 사용자 목록 조회 View
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+# ✨ 특정 사용자 정보 조회 View (pk로 지정)
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer    
+    
+    
+    
+    
+# 회원가입 (User 생성)
+class UserCreate(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]    

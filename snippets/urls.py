@@ -7,8 +7,10 @@ app_name = "snippets"  # 네임스페이스 지정
   
   
 urlpatterns = [
-    path("snippets/", views.SnippetList.as_view()),
-    path("snippets/<int:pk>/", views.SnippetDetail.as_view()),
+
+    path('', views.SnippetList.as_view(), name='snippet-list'),
+    path('<int:pk>/', views.SnippetDetail.as_view()),
+
 ]
 
 
