@@ -89,6 +89,23 @@ python manage.py showmigrations
 
 ---
 
+
+## 마이그레이션 초기화시 (초기화 방식으로)
+```bash
+rm -f db.sqlite3
+rm -r snippets/migrations
+python manage.py makemigrations snippets
+python manage.py migrate
+python manage.py createsuperuser  # 테스트 사용자 생성
+
+```
+
+
+
+
+
+---
+
 ## 📦 Commit 메시지 컨벤션 (Conventional Commits)
 
 복잡한 개발 과정을 관리하기 위해 [Conventional Commits](https://www.conventionalcommits.org/) 형식을 적용합니다.
