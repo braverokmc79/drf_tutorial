@@ -24,20 +24,29 @@ from rest_framework import serializers
 from snippets.models import Snippet
 from django.contrib.auth.models import User
 
-class SnippetSerializer(serializers.ModelSerializer):
+class SnippetSerializer(serializers.HyperlinkedModelSerializer):
 	# ... 기존 필드 생략 ...
     owner = serializers.ReadOnlyField(source='owner.username')
     highlighted = serializers.ReadOnlyField() # 두개 필드추가
-
+    highlight = serializers.HyperlinkedIdentityField(view_name='snippet-highlight', format='html')       
+    sampleTest = serializers.CharField(default="샘플 테스트 글자") #
+    
+    # owner, highlighted두개 필드 추가
     class Meta:
         model = Snippet
-        fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlighted'] # owner, highlighted두개 필드 추가
+        fields = ['id', 'title', 'code', 
+                  'linenos', 'language', 'style','owner',
+                  'highlighted','highlight' ,"sampleTest"] 
 
 
 
 # owner 사용자 API뷰 추가
 class UserSerializer(serializers.ModelSerializer):
-    snippets = serializers.PrimaryKeyRelatedField(many=True, queryset=Snippet.objects.all(), required=False)
+    snippets = serializers.HyperlinkedRelatedField(
+            many=True, 
+            queryset=Snippet.objects.all(),
+            view_name='snippet-detail',
+            required=False)
     password = serializers.CharField(write_only=True)
     
     def create(self, validated_data):
@@ -49,7 +58,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ['id', 'username', 'snippets', 'password']
+        fields = ['url', 'id', 'username', 'snippets', 'password']
 
 
 
